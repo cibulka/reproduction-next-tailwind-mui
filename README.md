@@ -1,34 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Hi! I'm trying to make [TailwindCSS](https://tailwindcss.com/) play nicely with [MUI](https://mui.com/). 
 
-## Getting Started
+The problem I'm facing is a different behaviour between development and production. Take this:
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
+```
+import Skeleton from '@mui/material/Skeleton'
+<Skeleton className="w-20 h-20" variant="circular" />
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+On **development**, Tailwind gets higher priority (is injected later, I assume), so it overwrites hardcoded MUI styles. That is the way I would prefer (especially as it seems that [one can not remove CSS rules in current version of MUI](https://stackoverflow.com/questions/64818441/remove-css-rule-for-material-ui-component-in-theme-overrides)).
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+<img width="991" alt="Screenshot 2021-12-16 at 12 00 56" src="https://user-images.githubusercontent.com/3989833/146359943-448e13fc-1845-4d95-af63-4b3eb724995c.png">
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+On **production**, MUI (resp. emotion) takes over, which slaps `height: 1.2rem` over the Skeleton and squishes it.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+<img width="1132" alt="Screenshot 2021-12-16 at 12 01 46" src="https://user-images.githubusercontent.com/3989833/146360034-64e1543c-f6aa-4198-936c-a165fdbf9753.png">
 
-## Learn More
+So yeah, not the best dev experience. :) Just imagine the number of bugs you find out *only after you deploy the thing*. 
 
-To learn more about Next.js, take a look at the following resources:
+[I've created the repo where you can reproduce the problem](https://github.com/cibulka/reproduction-next-tailwind-mui). You know the drill:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+npm install
+npm run dev # development
+npm run build && npm run start # production
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Is this expected behaviour? Can I regulate this somehow (e.g. give Tailwind bigger priority)? 
 
-## Deploy on Vercel
+Also I assume that out of the three, I should ask those questions to Next.js, as it does the CSS importing.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Thank you!
